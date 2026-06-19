@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School ERP SaaS Platform — Complete Design &amp; Specification</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2530; --line:#2d3947;
+    --txt:#d7e0ea; --muted:#8b97a7; --accent:#3b82f6; --accent2:#22d3ee;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171; --purple:#a78bfa;
+    --code:#0b1220; --radius:10px; --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.6;font-size:15px}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,pre{font-family:"SF Mono",Consolas,"Roboto Mono",monospace}
+  /* layout */
+  .wrap{display:flex;max-width:1500px;margin:0 auto}
+  nav.toc{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;
+    width:300px;flex:0 0 300px;background:var(--panel);border-right:1px solid var(--line);padding:20px 14px}
+  nav.toc h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 8px 6px}
+  nav.toc a{display:block;color:var(--txt);padding:5px 10px;border-radius:6px;font-size:13.5px}
+  nav.toc a:hover{background:var(--panel2);text-decoration:none}
+  nav.toc a.active{background:var(--accent);color:#fff}
+  main{flex:1;min-width:0;padding:36px 48px;max-width:calc(100% - 300px)}
+  /* hero */
+  .hero{background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid var(--line);
+    border-radius:16px;padding:40px;margin-bottom:34px;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;
+    background:radial-gradient(circle,rgba(59,130,246,.35),transparent 70%);}
+  .hero h1{margin:0 0 10px;font-size:32px;letter-spacing:-.5px}
+  .hero p{margin:4px 0;color:var(--muted);max-width:680px}
+  .badges{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+  .badge{background:var(--panel2);border:1px solid var(--line);padding:5px 12px;border-radius:20px;font-size:12.5px;color:var(--accent2)}
+  /* sections */
+  section{margin:0 0 46px;scroll-margin-top:20px}
+  h2.sec{font-size:24px;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:6px;
+    display:flex;align-items:center;gap:12px}
+  h2.sec .num{background:var(--accent);color:#fff;font-size:14px;width:30px;height:30px;display:inline-flex;
+    align-items:center;justify-content:center;border-radius:8px;flex:0 0 30px}
+  h3{font-size:18px;color:var(--accent2);margin-top:28px}
+  h4{font-size:15.5px;color:var(--purple);margin:18px 0 6px}
+  p.lead{color:var(--muted);margin-top:0}
+  /* cards / grid */
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));margin:16px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .card h4{margin:0 0 6px;color:var(--accent2)}
+  .card small{color:var(--muted)}
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel2);color:var(--accent2);font-weight:600;position:sticky}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(59,130,246,.06)}
+  .tbl-scroll{overflow-x:auto}
+  /* code */
+  pre{background:var(--code);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+    overflow-x:auto;font-size:13px;line-height:1.5;margin:14px 0}
+  pre code{color:#c9d6e3}
+  .kw{color:#ff7b72}.str{color:#a5d6ff}.com{color:#6b7785;font-style:italic}.fn{color:#d2a8ff}.num2{color:#79c0ff}
+  code.inline{background:var(--panel2);padding:1px 6px;border-radius:4px;color:var(--amber);font-size:13px}
+  /* pills */
+  .pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:12px;font-weight:600;margin:2px}
+  .p-get{background:rgba(52,211,153,.15);color:var(--green)}
+  .p-post{background:rgba(59,130,246,.15);color:var(--accent)}
+  .p-put{background:rgba(251,191,36,.15);color:var(--amber)}
+  .p-del{background:rgba(248,113,113,.15);color:var(--red)}
+  .role{background:var(--panel2);border:1px solid var(--line);color:var(--accent2)}
+  /* check matrix */
+  .yes{color:var(--green);font-weight:700}.no{color:#56606e}.part{color:var(--amber);font-weight:700}
+  /* diagram */
+  .diagram{background:var(--code);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    overflow-x:auto;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;color:#b8c4d2;white-space:pre;line-height:1.45}
+  .note{background:rgba(34,211,238,.08);border-left:3px solid var(--accent2);padding:10px 14px;border-radius:6px;margin:12px 0;color:var(--txt)}
+  .warn{background:rgba(251,191,36,.08);border-left:3px solid var(--amber);padding:10px 14px;border-radius:6px;margin:12px 0}
+  ul.tight li{margin:3px 0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:1100px){.two{grid-template-columns:1fr}}
+  @media(max-width:900px){nav.toc{display:none}main{max-width:100%;padding:20px}}
+  hr{border:none;border-top:1px solid var(--line);margin:30px 0}
+  .toc-counter{counter-reset:s}
+  footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:20px;margin-top:40px}
+  .modtag{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc" id="toc">
+  <h2>Specification</h2>
+  <a href="#overview">1. Project Overview</a>
+  <a href="#business">2. Business Requirements</a>
+  <a href="#functional">3. Functional Requirements</a>
+  <a href="#nfr">4. Non-Functional Requirements</a>
+  <a href="#modules">5. Module List</a>
+  <a href="#stories">6. User Stories</a>
+  <a href="#usecases">7. Use Cases</a>
+  <a href="#workflows">8. Workflow Diagrams</a>
+  <a href="#rbac">9. Role Permission Matrix</a>
+  <a href="#menu">10. Menu Structure</a>
+  <a href="#screens">11. Screen List</a>
+  <a href="#features">12. Feature List</a>
+  <h2>Engineering</h2>
+  <a href="#apis">13. API Specification</a>
+  <a href="#database">14. Database Design</a>
+  <a href="#er">15. ER Diagram</a>
+  <a href="#modspec">16. Module Specifications</a>
+  <a href="#backend">17. Node.js Structure</a>
+  <a href="#security">18. Security Architecture</a>
+  <a href="#deploy">19. Deployment Architecture</a>
+  <a href="#roadmap">20. Development Roadmap</a>
+  <a href="#checklist">21. Production Checklist</a>
+</nav>
+
+<main>
+  <div class="hero">
+    <h1>School ERP SaaS Platform</h1>
+    <p>Complete Software Requirement Specification (SRS), Functional &amp; Technical Design,
+       Database Design, API Specification, and System Architecture for a multi-tenant,
+       multi-organization, multi-branch enterprise School ERP.</p>
+    <p><strong>Scale target:</strong> 1,000+ Organizations &middot; 10,000+ Branches &middot; 1,000,000+ Students</p>
+    <div class="badges">
+      <span class="badge">Angular + Material</span>
+      <span class="badge">Node.js / Express</span>
+      <span class="badge">PostgreSQL</span>
+      <span class="badge">Redis Cache</span>
+      <span class="badge">Bull Queue</span>
+      <span class="badge">AWS S3</span>
+      <span class="badge">JWT + RBAC</span>
+      <span class="badge">Swagger / OpenAPI</span>
+      <span class="badge">Multi-Tenant SaaS</span>
+      <span class="badge">Microservice-Ready</span>
+    </div>
+    <p style="margin-top:18px;font-size:13px;color:var(--muted)">Document version 1.0 &middot; Status: Design Baseline &middot; Audience: Architecture, Product, Engineering, QA, DevOps</p>
+  </div>
+
+  <!-- ============ 1. OVERVIEW ============ -->
+  <section id="overview">
+    <h2 class="sec"><span class="num">1</span> Project Overview</h2>
+    <p class="lead">A cloud-native, multi-tenant SaaS platform that lets a single deployment serve thousands of independent schools (organizations), each running multiple physical branches, with strict data isolation, role-based access, and a unified billing/operations layer.</p>
+
+    <h3>1.1 Vision</h3>
+    <p>Deliver an all-in-one digital backbone for K-12 and higher-secondary institutions covering academics, administration, finance, operations and parent/student engagement — sold as a subscription product to school chains and individual schools.</p>
+
+    <h3>1.2 Objectives</h3>
+    <ul class="tight">
+      <li><strong>Single platform, many tenants:</strong> one codebase, logically isolated data per organization.</li>
+      <li><strong>Operational efficiency:</strong> automate admissions, attendance, fees, exams, payroll, transport and hostel operations.</li>
+      <li><strong>Engagement:</strong> real-time communication with parents and students via app, SMS, email and push.</li>
+      <li><strong>Compliance &amp; audit:</strong> immutable audit trail of every privileged action.</li>
+      <li><strong>Scale &amp; reliability:</strong> horizontally scalable, &ge;99.9% availability.</li>
+    </ul>
+
+    <h3>1.3 Tenancy Model</h3>
+    <div class="diagram">
+PLATFORM (Super Admin)
+ └── ORGANIZATION  (Tenant — e.g. "Delhi Public School Group")     org_id
+      ├── BRANCH    (Campus — e.g. "DPS Whitefield")               branch_id
+      │    ├── Academic Years → Classes → Sections
+      │    ├── Students / Parents / Employees / Teachers
+      │    └── Fees / Exams / Transport / Hostel / Library / Inventory
+      └── BRANCH    (Campus — "DPS Indiranagar")
+    </div>
+    <div class="note"><strong>Isolation strategy:</strong> Shared database, shared schema with a mandatory <code class="inline">org_id</code> (and where relevant <code class="inline">branch_id</code>) discriminator column on every tenant table, enforced by a Row-Level-Security policy + an application-tier tenant guard. Premium / enterprise tenants can be promoted to a dedicated schema or dedicated DB without code change (repository abstraction).</p></div>
+
+    <h3>1.4 Personas (14 Roles)</h3>
+    <div class="grid">
+      <div class="card"><h4>Super Admin</h4><small>Platform owner. Manages organizations, subscriptions, global config, feature flags.</small></div>
+      <div class="card"><h4>Organization Admin</h4><small>Tenant owner. Manages branches, org-wide users, roles, billing, policies.</small></div>
+      <div class="card"><h4>Branch Admin</h4><small>Campus head of administration. Manages branch users, masters, day-to-day ops.</small></div>
+      <div class="card"><h4>Principal</h4><small>Academic head. Approvals, analytics, staff oversight, exam &amp; result sign-off.</small></div>
+      <div class="card"><h4>Vice Principal</h4><small>Delegated principal duties, discipline, timetable, substitution.</small></div>
+      <div class="card"><h4>Teacher</h4><small>Subject delivery: homework, assignments, marks entry, attendance.</small></div>
+      <div class="card"><h4>Class Teacher</h4><small>Owns a section: roll-call, parent comms, conduct, report cards.</small></div>
+      <div class="card"><h4>Parent</h4><small>Views child progress, pays fees, communicates, grants leave/consent.</small></div>
+      <div class="card"><h4>Student</h4><small>Views timetable, homework, results, library, attendance.</small></div>
+      <div class="card"><h4>Accountant</h4><small>Fee structures, collections, refunds, finance ledger, reports.</small></div>
+      <div class="card"><h4>Librarian</h4><small>Catalog, issue/return, fines, stock audit.</small></div>
+      <div class="card"><h4>Transport Manager</h4><small>Routes, vehicles, drivers, GPS, student allocation.</small></div>
+      <div class="card"><h4>Hostel Warden</h4><small>Rooms, allocation, attendance, mess, visitors.</small></div>
+      <div class="card"><h4>HR Manager</h4><small>Employee lifecycle, leave, payroll, documents.</small></div>
+    </div>
+
+    <h3>1.5 Technology Stack</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+      <tr><td>Frontend</td><td>Angular (latest), Angular Material, RxJS, NgRx</td><td>SPA, component library, reactive state for complex flows (cart, exam entry).</td></tr>
+      <tr><td>API</td><td>Node.js, Express.js</td><td>Stateless REST services, JWT-secured.</td></tr>
+      <tr><td>Auth</td><td>JWT (access + refresh), bcrypt/argon2</td><td>Token auth, password hashing, rotation.</td></tr>
+      <tr><td>Cache</td><td>Redis</td><td>Session/refresh store, permission cache, rate limiting, hot reads.</td></tr>
+      <tr><td>Async</td><td>Bull (Redis-backed queues)</td><td>Notifications, report generation, bulk imports, billing runs.</td></tr>
+      <tr><td>Database</td><td>PostgreSQL 15+</td><td>Primary OLTP store, partitioned high-volume tables, RLS.</td></tr>
+      <tr><td>Storage</td><td>AWS S3</td><td>Documents, certificates, profile photos, report PDFs.</td></tr>
+      <tr><td>Docs</td><td>Swagger / OpenAPI 3.0</td><td>Living API contract &amp; client generation.</td></tr>
+      <tr><td>Infra</td><td>Docker, Kubernetes, NGINX, CloudFront</td><td>Containerized, autoscaled, CDN-fronted.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 2. BUSINESS REQUIREMENTS ============ -->
+  <section id="business">
+    <h2 class="sec"><span class="num">2</span> Business Requirements</h2>
+    <div class="tbl-scroll"><table>
+      <tr><th>ID</th><th>Business Requirement</th><th>Priority</th></tr>
+      <tr><td>BR-01</td><td>Onboard a new school (organization) with branches in under 30 minutes, self-service or assisted.</td><td>Must</td></tr>
+      <tr><td>BR-02</td><td>Subscription-based monetization with plans (Starter / Pro / Enterprise), per-student or per-branch pricing, trials and dunning.</td><td>Must</td></tr>
+      <tr><td>BR-03</td><td>Complete data isolation between tenants; no tenant can read another's data.</td><td>Must</td></tr>
+      <tr><td>BR-04</td><td>Configurable academic structure (grading scheme, terms, sections) per organization/branch.</td><td>Must</td></tr>
+      <tr><td>BR-05</td><td>Online fee collection with payment-gateway integration, receipts and reconciliation.</td><td>Must</td></tr>
+      <tr><td>BR-06</td><td>Parent/student self-service portal &amp; mobile app reducing front-office load.</td><td>Should</td></tr>
+      <tr><td>BR-07</td><td>Regulatory &amp; financial audit trail retained 7+ years.</td><td>Must</td></tr>
+      <tr><td>BR-08</td><td>White-label branding (logo, colors, domain) per organization.</td><td>Should</td></tr>
+      <tr><td>BR-09</td><td>Multi-language &amp; multi-currency support.</td><td>Should</td></tr>
+      <tr><td>BR-10</td><td>Actionable dashboards &amp; exports for management decision-making.</td><td>Must</td></tr>
+    </table></div>
+    <h3>2.1 Success Metrics (KPIs)</h3>
+    <ul class="tight">
+      <li>&le; 30 min average tenant onboarding time.</li>
+      <li>&ge; 95% online fee-collection adoption within 2 terms.</li>
+      <li>&lt; 300 ms p95 API latency at target scale.</li>
+      <li>&ge; 99.9% monthly uptime.</li>
+      <li>&lt; 2% monthly churn.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 3. FUNCTIONAL REQUIREMENTS ============ -->
+  <section id="functional">
+    <h2 class="sec"><span class="num">3</span> Functional Requirements</h2>
+    <p class="lead">Selected representative functional requirements (full set maintained in the requirements register; each FR maps to one or more APIs and screens).</p>
+    <div class="tbl-scroll"><table>
+      <tr><th>ID</th><th>Module</th><th>Requirement</th></tr>
+      <tr><td>FR-AUTH-01</td><td>Auth</td><td>Users authenticate with email/username + password and receive an access token (15 min) and refresh token (7 days).</td></tr>
+      <tr><td>FR-AUTH-02</td><td>Auth</td><td>System enforces MFA (OTP) for Super/Org/Branch admins.</td></tr>
+      <tr><td>FR-ORG-01</td><td>Organization</td><td>Super Admin can create, suspend, activate and configure organizations with plan &amp; quotas.</td></tr>
+      <tr><td>FR-BR-01</td><td>Branch</td><td>Org Admin can create branches; each branch inherits org config but allows overrides.</td></tr>
+      <tr><td>FR-USR-01</td><td>User</td><td>Admins can invite users, assign one or more roles scoped to org/branch.</td></tr>
+      <tr><td>FR-RBAC-01</td><td>RBAC</td><td>Every API enforces permission checks based on the caller's effective permission set.</td></tr>
+      <tr><td>FR-STU-01</td><td>Student</td><td>Create/update student with admission, link parents/guardians, assign class &amp; section.</td></tr>
+      <tr><td>FR-ATT-01</td><td>Attendance</td><td>Class Teacher records daily section attendance; auto-notify absentees' parents.</td></tr>
+      <tr><td>FR-HW-01</td><td>Homework</td><td>Teacher posts homework per subject/section with attachments &amp; due date.</td></tr>
+      <tr><td>FR-EXM-01</td><td>Exam</td><td>Define exams, schedules, max marks; teachers enter marks; system computes grade &amp; rank.</td></tr>
+      <tr><td>FR-FEE-01</td><td>Fees</td><td>Define fee structure per class/term; generate student dues; accept online &amp; offline payments; issue receipts.</td></tr>
+      <tr><td>FR-LIB-01</td><td>Library</td><td>Catalog books, issue/return with due dates, compute fines.</td></tr>
+      <tr><td>FR-TRP-01</td><td>Transport</td><td>Define routes/stops/vehicles, allocate students, track GPS live.</td></tr>
+      <tr><td>FR-HOS-01</td><td>Hostel</td><td>Allocate rooms/beds, record hostel attendance, manage mess &amp; visitors.</td></tr>
+      <tr><td>FR-PAY-01</td><td>Payroll</td><td>Compute salary from attendance, leave &amp; components; generate payslips.</td></tr>
+      <tr><td>FR-NOT-01</td><td>Notification</td><td>Deliver multi-channel (in-app/email/SMS/push) notifications via queue with retries.</td></tr>
+      <tr><td>FR-AUD-01</td><td>Audit</td><td>Persist immutable audit entry for every create/update/delete on privileged entities.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 4. NFR ============ -->
+  <section id="nfr">
+    <h2 class="sec"><span class="num">4</span> Non-Functional Requirements</h2>
+    <div class="grid">
+      <div class="card"><h4>Performance</h4><small>p95 API &lt; 300 ms; dashboards &lt; 1 s; bulk imports async via queue.</small></div>
+      <div class="card"><h4>Scalability</h4><small>Stateless API, horizontal pod autoscaling; partitioned hot tables; read replicas.</small></div>
+      <div class="card"><h4>Availability</h4><small>&ge; 99.9% uptime; multi-AZ; graceful degradation when cache/queue down.</small></div>
+      <div class="card"><h4>Security</h4><small>OWASP Top 10 hardened; encryption in transit (TLS 1.2+) &amp; at rest (AES-256).</small></div>
+      <div class="card"><h4>Data Isolation</h4><small>Tenant guard + Postgres RLS; zero cross-tenant leakage.</small></div>
+      <div class="card"><h4>Maintainability</h4><small>Layered architecture, &ge;80% test coverage on services, lint &amp; CI gates.</small></div>
+      <div class="card"><h4>Observability</h4><small>Structured logs, request tracing (correlation-id), metrics, alerts.</small></div>
+      <div class="card"><h4>Auditability</h4><small>Immutable append-only audit &amp; API logs, 7-year retention.</small></div>
+      <div class="card"><h4>Localization</h4><small>i18n, RTL, multi-currency, timezone per branch.</small></div>
+      <div class="card"><h4>Recoverability</h4><small>RPO &le; 5 min (PITR), RTO &le; 30 min; daily + continuous backups.</small></div>
+      <div class="card"><h4>Compliance</h4><small>GDPR/regional data-protection; data residency per region; consent tracking.</small></div>
+      <div class="card"><h4>Accessibility</h4><small>WCAG 2.1 AA compliant front-end.</small></div>
+    </div>
+  </section>
+
+  <!-- ============ 5. MODULE LIST ============ -->
+  <section id="modules">
+    <h2 class="sec"><span class="num">5</span> Complete Module List</h2>
+    <div class="grid">
+      <div class="card"><span class="modtag">Platform</span><h4>Organization Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>Branch Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>User Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>Role Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>Permission Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Student Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Parent Management</h4></div>
+      <div class="card"><span class="modtag">HR</span><h4>Employee Management</h4></div>
+      <div class="card"><span class="modtag">HR</span><h4>Teacher Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Attendance Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Homework Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Assignment Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Examination Management</h4></div>
+      <div class="card"><span class="modtag">Finance</span><h4>Fees Management</h4></div>
+      <div class="card"><span class="modtag">Operations</span><h4>Library Management</h4></div>
+      <div class="card"><span class="modtag">Operations</span><h4>Transport Management</h4></div>
+      <div class="card"><span class="modtag">Operations</span><h4>Hostel Management</h4></div>
+      <div class="card"><span class="modtag">Operations</span><h4>Inventory Management</h4></div>
+      <div class="card"><span class="modtag">Engagement</span><h4>Communication Management</h4></div>
+      <div class="card"><span class="modtag">Engagement</span><h4>Notification Management</h4></div>
+      <div class="card"><span class="modtag">HR</span><h4>Leave Management</h4></div>
+      <div class="card"><span class="modtag">HR</span><h4>Payroll Management</h4></div>
+      <div class="card"><span class="modtag">Finance</span><h4>Finance Management</h4></div>
+      <div class="card"><span class="modtag">Engagement</span><h4>Event Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Certificate Management</h4></div>
+      <div class="card"><span class="modtag">Academic</span><h4>Admission Management</h4></div>
+      <div class="card"><span class="modtag">Operations</span><h4>Visitor Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>Document Management</h4></div>
+      <div class="card"><span class="modtag">Analytics</span><h4>Report Management</h4></div>
+      <div class="card"><span class="modtag">Platform</span><h4>Audit Management</h4></div>
+    </div>
+  </section>
+
+  <!-- ============ 6. USER STORIES ============ -->
+  <section id="stories">
+    <h2 class="sec"><span class="num">6</span> User Stories</h2>
+    <div class="tbl-scroll"><table>
+      <tr><th>ID</th><th>As a…</th><th>I want to…</th><th>So that…</th></tr>
+      <tr><td>US-01</td><td>Super Admin</td><td>create a new organization with a subscription plan</td><td>a new school can start using the platform.</td></tr>
+      <tr><td>US-02</td><td>Org Admin</td><td>add branches and assign branch admins</td><td>each campus is managed independently.</td></tr>
+      <tr><td>US-03</td><td>Branch Admin</td><td>configure academic year, classes and sections</td><td>students can be enrolled correctly.</td></tr>
+      <tr><td>US-04</td><td>Class Teacher</td><td>mark daily attendance in one screen</td><td>absentee parents are notified automatically.</td></tr>
+      <tr><td>US-05</td><td>Teacher</td><td>post homework with attachments and a due date</td><td>students and parents see assignments instantly.</td></tr>
+      <tr><td>US-06</td><td>Teacher</td><td>enter exam marks in a grid with validation</td><td>grades and ranks compute automatically.</td></tr>
+      <tr><td>US-07</td><td>Parent</td><td>pay fees online and download the receipt</td><td>I avoid queuing at the office.</td></tr>
+      <tr><td>US-08</td><td>Parent</td><td>see my child's attendance, marks and homework</td><td>I can track progress in real time.</td></tr>
+      <tr><td>US-09</td><td>Student</td><td>view my timetable, results and library status</td><td>I stay organized.</td></tr>
+      <tr><td>US-10</td><td>Accountant</td><td>generate fee-collection and outstanding reports</td><td>finance is reconciled and dues are followed up.</td></tr>
+      <tr><td>US-11</td><td>Librarian</td><td>issue and return books by scanning</td><td>circulation is fast and fines auto-calculate.</td></tr>
+      <tr><td>US-12</td><td>Transport Manager</td><td>assign students to routes and track buses live</td><td>parents know ETA and children are safe.</td></tr>
+      <tr><td>US-13</td><td>Hostel Warden</td><td>allocate rooms and record hostel attendance</td><td>occupancy and safety are managed.</td></tr>
+      <tr><td>US-14</td><td>HR Manager</td><td>run monthly payroll from attendance &amp; leave</td><td>staff are paid accurately and on time.</td></tr>
+      <tr><td>US-15</td><td>Principal</td><td>approve results before publishing</td><td>report cards are accurate and authorized.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 7. USE CASES ============ -->
+  <section id="usecases">
+    <h2 class="sec"><span class="num">7</span> Use Cases</h2>
+    <h3>UC-01 — Online Fee Payment</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>Actor</td><td>Parent (primary), Payment Gateway (secondary), Accountant (observer)</td></tr>
+      <tr><td>Pre-conditions</td><td>Parent authenticated; student has outstanding dues; gateway configured.</td></tr>
+      <tr><td>Main Flow</td><td>1) Parent opens Fees → sees dues. 2) Selects term/components → "Pay Now". 3) System creates a payment intent + order. 4) Redirect to gateway → pays. 5) Gateway webhook confirms. 6) System marks dues paid, generates receipt PDF to S3, emits notification.</td></tr>
+      <tr><td>Alt Flow</td><td>4a) Payment fails/cancelled → intent marked failed, dues unchanged, parent can retry.</td></tr>
+      <tr><td>Post-conditions</td><td>Ledger updated; receipt available; audit logged; accountant report reflects collection.</td></tr>
+      <tr><td>Exceptions</td><td>Webhook lost → reconciliation job polls gateway and self-heals.</td></tr>
+    </table></div>
+
+    <h3>UC-02 — Daily Attendance &amp; Auto-Notify</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>Actor</td><td>Class Teacher (primary), Parent (recipient)</td></tr>
+      <tr><td>Pre-conditions</td><td>Section has enrolled students; teacher assigned to section.</td></tr>
+      <tr><td>Main Flow</td><td>1) Teacher opens Attendance for section/date. 2) Marks present/absent/late. 3) Submits → records persisted. 4) Async job notifies parents of absentees.</td></tr>
+      <tr><td>Post-conditions</td><td>Attendance stored, parent notified, daily % updated on dashboards.</td></tr>
+    </table></div>
+
+    <h3>UC-03 — Tenant Onboarding</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>Actor</td><td>Super Admin</td></tr>
+      <tr><td>Main Flow</td><td>1) Create organization (name, plan, quota, region). 2) Provision Org Admin user + invite email. 3) Org Admin sets branding, creates branches, imports masters. 4) System seeds default roles/permissions for the tenant.</td></tr>
+      <tr><td>Post-conditions</td><td>Tenant active, billable, isolated; Org Admin can operate.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 8. WORKFLOWS ============ -->
+  <section id="workflows">
+    <h2 class="sec"><span class="num">8</span> Workflow Diagrams</h2>
+
+    <h3>8.1 Authentication &amp; Token Refresh</h3>
+    <div class="diagram">
+ Client            API Gateway        Auth Service        Redis           PostgreSQL
+   │  POST /login      │                  │                 │                 │
+   │ ─────────────────▶│ ───────────────▶ │  verify user    │                 │
+   │                   │                  │ ──────────────────────────────────▶│
+   │                   │                  │  bcrypt compare  │◀────────────────│
+   │                   │                  │  store refresh   │                 │
+   │                   │                  │ ───────────────▶ │ (jti, ttl 7d)   │
+   │   200 {access,    │                  │                 │                 │
+   │      refresh}     │◀──────────────── │                 │                 │
+   │◀──────────────────│                  │                 │                 │
+   │                                                                          │
+   │  ... access expires (15m) ...                                            │
+   │  POST /refresh {refresh}                                                 │
+   │ ─────────────────▶│  validate jti in Redis ─────────▶ │ rotate → new pair│
+   │   200 {access,refresh'}                                                  │
+    </div>
+
+    <h3>8.2 Async Notification Pipeline (Bull Queue)</h3>
+    <div class="diagram">
+ [API Producer] ──enqueue──▶ ( Redis : notifications queue )
+                                   │
+                  ┌────────────────┼────────────────┐
+                  ▼                ▼                ▼
+            [Worker 1]        [Worker 2]       [Worker N]
+                  │  channel router
+        ┌─────────┼──────────┬───────────┐
+        ▼         ▼          ▼           ▼
+     [Email]   [SMS]     [Push/FCM]   [In-App]
+        │         │          │           │
+        └────── persist delivery status + retry (exp backoff) ──────┘
+                            │ on permanent fail → dead-letter queue
+    </div>
+
+    <h3>8.3 Examination → Result Publish</h3>
+    <div class="diagram">
+ Define Exam ─▶ Schedule Papers ─▶ Teachers Enter Marks ─▶ Compute Grade/Rank
+       │                                                          │
+       │                                                  Principal Review
+       │                                                          │
+       │                                              ┌──── Approve ────┐
+       │                                              ▼                 ▼
+       │                                        Publish Results    Reject → Re-enter
+       │                                              │
+       │                                   Generate Report Cards (PDF → S3)
+       │                                              │
+       │                                     Notify Parents/Students
+    </div>
+
+    <h3>8.4 Admission Workflow</h3>
+    <div class="diagram">
+ Enquiry ─▶ Application ─▶ Document Upload ─▶ Entrance/Interview ─▶ Decision
+                                                                     │
+                                              ┌───── Selected ───────┤
+                                              ▼                      ▼
+                                    Offer + Fee Payment        Rejected/Waitlist
+                                              │
+                                       Enroll → Student record + Roll No + Section
+    </div>
+  </section>
+
+  <!-- ============ 9. RBAC MATRIX ============ -->
+  <section id="rbac">
+    <h2 class="sec"><span class="num">9</span> Role &times; Permission Matrix</h2>
+    <p class="lead">Legend: <span class="yes">●</span> Full &nbsp; <span class="part">◐</span> Scoped/Own &nbsp; <span class="no">○</span> None. Scope = data the role can act on (Platform / Org / Branch / Section / Self).</p>
+    <div class="tbl-scroll"><table style="font-size:12.5px">
+      <tr>
+        <th>Module \ Role</th>
+        <th>Super</th><th>Org Adm</th><th>Br Adm</th><th>Princ</th><th>V.Princ</th><th>Teacher</th><th>Cls Tch</th><th>Parent</th><th>Student</th><th>Acct</th><th>Libr</th><th>Transp</th><th>Hostel</th><th>HR</th>
+      </tr>
+      <tr><td>Organization</td><td class="yes">●</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Branch</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Users &amp; Roles</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td></tr>
+      <tr><td>Students</td><td class="part">◐</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Attendance</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="no">○</td></tr>
+      <tr><td>Homework/Assign.</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Examination</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Fees</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="yes">●</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Finance</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="yes">●</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Library</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="yes">●</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Transport</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="yes">●</td><td class="no">○</td><td class="no">○</td></tr>
+      <tr><td>Hostel</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="yes">●</td><td class="no">○</td></tr>
+      <tr><td>Payroll</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="yes">●</td></tr>
+      <tr><td>Leave</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="yes">●</td></tr>
+      <tr><td>Reports</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td><td class="part">◐</td></tr>
+      <tr><td>Audit Logs</td><td class="yes">●</td><td class="part">◐</td><td class="part">◐</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td><td class="no">○</td></tr>
+    </table></div>
+    <div class="note">Permissions are stored granularly as <code class="inline">module.action</code> (e.g. <code class="inline">student.create</code>, <code class="inline">fee.collect</code>, <code class="inline">exam.publish</code>). Roles are bundles of permissions; a user may hold several roles, and the effective set is the union, intersected with the user's org/branch scope.</div>
+  </section>
+
+  <!-- ============ 10. MENU ============ -->
+  <section id="menu">
+    <h2 class="sec"><span class="num">10</span> Menu Structure</h2>
+    <div class="two">
+      <div>
+        <h4>Super Admin</h4>
+        <div class="diagram">Dashboard
+Organizations
+ ├ All Organizations
+ ├ Subscriptions &amp; Plans
+ └ Billing &amp; Invoices
+Platform Users
+Feature Flags
+Global Settings
+System Health
+Audit Logs</div>
+        <h4>Org / Branch Admin</h4>
+        <div class="diagram">Dashboard
+Branches
+Academic Setup
+ ├ Academic Years
+ ├ Classes &amp; Sections
+ └ Subjects
+Users &amp; Roles
+Admissions
+Students
+Employees
+Fees &amp; Finance
+Reports
+Settings (Branding, Channels)
+Audit Logs</div>
+      </div>
+      <div>
+        <h4>Teacher / Class Teacher</h4>
+        <div class="diagram">Dashboard
+My Classes
+Attendance
+Homework
+Assignments
+Examinations
+ ├ Marks Entry
+ └ Results
+Timetable
+Communication
+Leave (Self)</div>
+        <h4>Parent / Student</h4>
+        <div class="diagram">Dashboard
+My Children / Profile
+Attendance
+Homework &amp; Assignments
+Exam Results &amp; Report Card
+Fees &amp; Payments
+Timetable
+Transport (Live Track)
+Library
+Communication
+Events &amp; Calendar
+Documents &amp; Certificates</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 11. SCREENS ============ -->
+  <section id="screens">
+    <h2 class="sec"><span class="num">11</span> Screen List</h2>
+    <div class="tbl-scroll"><table>
+      <tr><th>Area</th><th>Screens</th></tr>
+      <tr><td>Auth</td><td>Login, Forgot Password, Reset Password, MFA/OTP, Set New Password.</td></tr>
+      <tr><td>Platform</td><td>Org List, Org Create/Edit, Plan &amp; Subscription, Billing, Feature Flags, System Health, Global Audit.</td></tr>
+      <tr><td>Dashboards</td><td>Super Dashboard, Org Dashboard, Branch Dashboard, Teacher Dashboard, Parent/Student Dashboard.</td></tr>
+      <tr><td>Setup</td><td>Branch List/Form, Academic Year, Class &amp; Section, Subject, Grading Scheme, Roles &amp; Permissions, User Invite.</td></tr>
+      <tr><td>Admissions</td><td>Enquiry, Application Form, Document Upload, Shortlist, Interview Schedule, Decision, Enrollment.</td></tr>
+      <tr><td>Students</td><td>Student List, Student Profile, Add/Edit Student, Parent Linkage, Promotion/Transfer, ID Card.</td></tr>
+      <tr><td>Attendance</td><td>Mark Attendance, Attendance Register, Monthly Summary, Biometric Sync.</td></tr>
+      <tr><td>Academics</td><td>Homework Board, Assignment Submission, Timetable Builder, Lesson Plan.</td></tr>
+      <tr><td>Examination</td><td>Exam Setup, Schedule, Marks Entry Grid, Result Review/Approve, Report Card, Mark Sheet.</td></tr>
+      <tr><td>Fees</td><td>Fee Structure, Generate Dues, Collect Payment, Online Pay, Receipt, Outstanding Report, Refund.</td></tr>
+      <tr><td>Library</td><td>Catalog, Book Form, Issue/Return, Fines, Stock Audit.</td></tr>
+      <tr><td>Transport</td><td>Routes, Stops, Vehicles, Drivers, Allocation, Live Map.</td></tr>
+      <tr><td>Hostel</td><td>Blocks/Rooms, Allocation, Hostel Attendance, Mess, Visitors.</td></tr>
+      <tr><td>HR/Payroll</td><td>Employee List/Profile, Leave Apply/Approve, Salary Structure, Payroll Run, Payslip.</td></tr>
+      <tr><td>Comms</td><td>Compose Notice, Message Threads, Notification Center, Templates.</td></tr>
+      <tr><td>Events</td><td>Calendar, Event Form, RSVP, Gallery.</td></tr>
+      <tr><td>Documents</td><td>Document Vault, Certificate Generator, Certificate Verify.</td></tr>
+      <tr><td>Reports</td><td>Report Builder, Saved Reports, Exports.</td></tr>
+      <tr><td>Settings</td><td>Branding, Channels (SMS/Email/Payment), Profile, Security/MFA.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 12. FEATURE LIST ============ -->
+  <section id="features">
+    <h2 class="sec"><span class="num">12</span> Feature List (Highlights)</h2>
+    <div class="grid">
+      <div class="card"><h4>Multi-tenant onboarding</h4><small>Self-service org creation, plan selection, automated provisioning.</small></div>
+      <div class="card"><h4>White-label branding</h4><small>Per-org logo, theme, custom domain.</small></div>
+      <div class="card"><h4>Granular RBAC</h4><small>Custom roles, permission bundles, scope-aware enforcement.</small></div>
+      <div class="card"><h4>Online fee collection</h4><small>Gateway integration, receipts, reconciliation, dunning.</small></div>
+      <div class="card"><h4>Bulk import/export</h4><small>CSV/Excel student/employee import via async jobs with error reports.</small></div>
+      <div class="card"><h4>Live bus tracking</h4><small>GPS feed, ETA, geofence alerts.</small></div>
+      <div class="card"><h4>Auto report cards</h4><small>Grade/rank computation, PDF generation to S3.</small></div>
+      <div class="card"><h4>Multi-channel notifications</h4><small>In-app, email, SMS, push with retries &amp; delivery tracking.</small></div>
+      <div class="card"><h4>Biometric/RFID attendance</h4><small>Device sync adapters, fallback manual entry.</small></div>
+      <div class="card"><h4>Payroll automation</h4><small>Attendance/leave-driven salary, payslips.</small></div>
+      <div class="card"><h4>Certificate engine</h4><small>Template-based, QR-verifiable certificates.</small></div>
+      <div class="card"><h4>Audit &amp; compliance</h4><small>Immutable logs, exports, 7-year retention.</small></div>
+    </div>
+  </section>
+
+  <!-- ============ 13. API SPEC ============ -->
+  <section id="apis">
+    <h2 class="sec"><span class="num">13</span> API Specification</h2>
+    <p class="lead">REST, JSON, versioned under <code class="inline">/api/v1</code>. All non-auth endpoints require <code class="inline">Authorization: Bearer &lt;access&gt;</code>. Tenant context (<code class="inline">org_id</code>, <code class="inline">branch_id</code>) is derived from the token, never the body. Standard envelope, pagination, and error format below.</p>
+
+    <h3>13.1 Conventions</h3>
+    <pre><code><span class="com">// Success envelope</span>
+{
+  "success": <span class="kw">true</span>,
+  "data": { ... } <span class="com">// or [ ... ]</span>,
+  "meta": { "page": <span class="num2">1</span>, "limit": <span class="num2">20</span>, "total": <span class="num2">357</span>, "totalPages": <span class="num2">18</span> },
+  "requestId": <span class="str">"a1b2c3d4"</span>
+}
+
+<span class="com">// Error envelope</span>
+{
+  "success": <span class="kw">false</span>,
+  "error": {
+    "code": <span class="str">"VALIDATION_ERROR"</span>,
+    "message": <span class="str">"Validation failed"</span>,
+    "details": [{ "field": <span class="str">"email"</span>, "issue": <span class="str">"Invalid email"</span> }]
+  },
+  "requestId": <span class="str">"a1b2c3d4"</span>
+}</code></pre>
+
+    <h3>13.2 Standard HTTP / Error Codes</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Status</th><th>Code</th><th>Meaning</th></tr>
+      <tr><td>200/201</td><td>—</td><td>Success / Created</td></tr>
+      <tr><td>400</td><td>VALIDATION_ERROR</td><td>Request failed validation</td></tr>
+      <tr><td>401</td><td>UNAUTHENTICATED</td><td>Missing/expired token</td></tr>
+      <tr><td>403</td><td>FORBIDDEN</td><td>Authenticated but lacks permission / wrong tenant</td></tr>
+      <tr><td>404</td><td>NOT_FOUND</td><td>Resource not found in tenant scope</td></tr>
+      <tr><td>409</td><td>CONFLICT</td><td>Duplicate / state conflict</td></tr>
+      <tr><td>422</td><td>UNPROCESSABLE</td><td>Business rule violation</td></tr>
+      <tr><td>429</td><td>RATE_LIMITED</td><td>Too many requests</td></tr>
+      <tr><td>500</td><td>INTERNAL_ERROR</td><td>Unhandled server error (logged with requestId)</td></tr>
+    </table></div>
+
+    <h3>13.3 Detailed Examples — Students CRUD</h3>
+
+    <h4><span class="pill p-post">POST</span> /api/v1/students</h4>
+    <p>Create a student. <strong>Auth:</strong> <code class="inline">student.create</code> (Branch Admin / Admin).</p>
+    <pre><code><span class="com">// Request</span>
+{
+  "admissionNo": <span class="str">"2026-00187"</span>,
+  "firstName": <span class="str">"Aarav"</span>,
+  "lastName": <span class="str">"Sharma"</span>,
+  "dob": <span class="str">"2014-05-21"</span>,
+  "gender": <span class="str">"MALE"</span>,
+  "classId": <span class="num2">12</span>,
+  "sectionId": <span class="num2">34</span>,
+  "academicYearId": <span class="num2">3</span>,
+  "rollNo": <span class="str">"18"</span>,
+  "parents": [{ "parentId": <span class="num2">501</span>, "relation": <span class="str">"FATHER"</span>, "isPrimary": <span class="kw">true</span> }]
+}
+
+<span class="com">// 201 Response</span>
+{ "success": <span class="kw">true</span>, "data": { "id": <span class="num2">9001</span>, "admissionNo": <span class="str">"2026-00187"</span>,
+  "status": <span class="str">"ACTIVE"</span>, "createdAt": <span class="str">"2026-06-19T08:12:00Z"</span> } }</code></pre>
+    <div class="tbl-scroll"><table>
+      <tr><th>Validation</th><th>Rule</th></tr>
+      <tr><td>admissionNo</td><td>required, unique per (org_id, branch_id)</td></tr>
+      <tr><td>firstName</td><td>required, 1–80 chars</td></tr>
+      <tr><td>dob</td><td>required, ISO date, age within class range</td></tr>
+      <tr><td>classId/sectionId</td><td>must exist in branch &amp; active academic year; section belongs to class</td></tr>
+      <tr><td>rollNo</td><td>unique within section</td></tr>
+    </table></div>
+
+    <h4><span class="pill p-get">GET</span> /api/v1/students</h4>
+    <p>List/search with pagination &amp; filters. <strong>Auth:</strong> <code class="inline">student.read</code>.</p>
+    <pre><code>GET /api/v1/students?classId=12&amp;sectionId=34&amp;status=ACTIVE&amp;search=aarav&amp;page=1&amp;limit=20&amp;sort=-createdAt</code></pre>
+
+    <h4><span class="pill p-get">GET</span> /api/v1/students/{id}</h4>
+    <p>Fetch one student (404 if outside tenant scope). <strong>Auth:</strong> <code class="inline">student.read</code> (or owner Parent/Student).</p>
+
+    <h4><span class="pill p-put">PUT</span> /api/v1/students/{id}</h4>
+    <p>Update student. <strong>Auth:</strong> <code class="inline">student.update</code>. 409 on admissionNo conflict, 422 on invalid class transition.</p>
+
+    <h4><span class="pill p-del">DELETE</span> /api/v1/students/{id}</h4>
+    <p>Soft-delete (sets <code class="inline">status=INACTIVE</code>, <code class="inline">deleted_at</code>). <strong>Auth:</strong> <code class="inline">student.delete</code>. Hard delete restricted to Super Admin + retention policy.</p>
+
+    <h3>13.4 API Catalog (Representative)</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Domain</th><th>Endpoints</th></tr>
+      <tr><td>Auth</td><td><span class="pill p-post">POST</span>/auth/login · <span class="pill p-post">POST</span>/auth/refresh · <span class="pill p-post">POST</span>/auth/logout · <span class="pill p-post">POST</span>/auth/forgot · <span class="pill p-post">POST</span>/auth/reset · <span class="pill p-post">POST</span>/auth/mfa/verify</td></tr>
+      <tr><td>Organizations</td><td><span class="pill p-get">GET</span>/organizations · <span class="pill p-post">POST</span>/organizations · <span class="pill p-get">GET</span>/organizations/{id} · <span class="pill p-put">PUT</span>/organizations/{id} · <span class="pill p-post">POST</span>/organizations/{id}/suspend</td></tr>
+      <tr><td>Branches</td><td><span class="pill p-get">GET</span>/branches · <span class="pill p-post">POST</span>/branches · <span class="pill p-get">GET</span>/branches/{id} · <span class="pill p-put">PUT</span>/branches/{id} · <span class="pill p-del">DELETE</span>/branches/{id}</td></tr>
+      <tr><td>Users &amp; RBAC</td><td><span class="pill p-get">GET</span>/users · <span class="pill p-post">POST</span>/users · <span class="pill p-put">PUT</span>/users/{id} · <span class="pill p-get">GET</span>/roles · <span class="pill p-post">POST</span>/roles · <span class="pill p-get">GET</span>/permissions · <span class="pill p-post">POST</span>/roles/{id}/permissions</td></tr>
+      <tr><td>Students/Parents</td><td>CRUD /students · /parents · <span class="pill p-post">POST</span>/students/{id}/promote · <span class="pill p-post">POST</span>/students/import</td></tr>
+      <tr><td>Attendance</td><td><span class="pill p-post">POST</span>/attendance/students · <span class="pill p-get">GET</span>/attendance/students · <span class="pill p-post">POST</span>/attendance/employees · <span class="pill p-get">GET</span>/attendance/summary</td></tr>
+      <tr><td>Academics</td><td>CRUD /homeworks · /assignments · <span class="pill p-post">POST</span>/assignments/{id}/submit · CRUD /timetable</td></tr>
+      <tr><td>Examination</td><td>CRUD /exams · <span class="pill p-post">POST</span>/exams/{id}/marks · <span class="pill p-post">POST</span>/exams/{id}/publish · <span class="pill p-get">GET</span>/students/{id}/report-card</td></tr>
+      <tr><td>Fees</td><td>CRUD /fee-structures · <span class="pill p-post">POST</span>/fees/generate · <span class="pill p-get">GET</span>/students/{id}/fees · <span class="pill p-post">POST</span>/fees/{id}/pay · <span class="pill p-post">POST</span>/fees/webhook · <span class="pill p-get">GET</span>/fees/receipts/{id}</td></tr>
+      <tr><td>Library</td><td>CRUD /books · <span class="pill p-post">POST</span>/library/issue · <span class="pill p-post">POST</span>/library/return · <span class="pill p-get">GET</span>/library/fines</td></tr>
+      <tr><td>Transport</td><td>CRUD /vehicles · /routes · <span class="pill p-post">POST</span>/transport/allocate · <span class="pill p-get">GET</span>/transport/track/{vehicleId}</td></tr>
+      <tr><td>Hostel</td><td>CRUD /hostels · /rooms · <span class="pill p-post">POST</span>/hostel/allocate · <span class="pill p-post">POST</span>/hostel/attendance</td></tr>
+      <tr><td>HR/Payroll</td><td>CRUD /employees · /leaves · <span class="pill p-post">POST</span>/leaves/{id}/approve · <span class="pill p-post">POST</span>/payroll/run · <span class="pill p-get">GET</span>/payslips/{id}</td></tr>
+      <tr><td>Comms/Notify</td><td><span class="pill p-post">POST</span>/notices · <span class="pill p-get">GET</span>/notifications · <span class="pill p-put">PUT</span>/notifications/{id}/read · CRUD /templates</td></tr>
+      <tr><td>Documents/Certs</td><td><span class="pill p-post">POST</span>/documents (presigned) · <span class="pill p-get">GET</span>/documents/{id} · <span class="pill p-post">POST</span>/certificates/generate · <span class="pill p-get">GET</span>/certificates/verify/{code}</td></tr>
+      <tr><td>Reports</td><td><span class="pill p-post">POST</span>/reports/run · <span class="pill p-get">GET</span>/reports/{id} · <span class="pill p-get">GET</span>/reports/{id}/export</td></tr>
+      <tr><td>Audit</td><td><span class="pill p-get">GET</span>/audit-logs · <span class="pill p-get">GET</span>/api-logs</td></tr>
+    </table></div>
+    <div class="note">OpenAPI 3.0 spec is served at <code class="inline">/api/docs</code> (Swagger UI) and <code class="inline">/api/docs.json</code>, auto-generated from route + validator decorators, enabling typed client generation for the Angular app.</div>
+  </section>
+
+  <!-- ============ 14. DATABASE ============ -->
+  <section id="database">
+    <h2 class="sec"><span class="num">14</span> Database Design (PostgreSQL)</h2>
+    <div class="warn"><strong>PostgreSQL note:</strong> Postgres does not support MySQL-style inline <code class="inline">COMMENT '...'</code> in <code class="inline">CREATE TABLE</code>. Column intent is documented with inline <code class="inline">--</code> comments and formal <code class="inline">COMMENT ON COLUMN</code> statements (shown once below). Every tenant table carries <code class="inline">org_id</code> (+ <code class="inline">branch_id</code> where applicable) and standard audit columns.</div>
+
+    <h3>14.1 Conventions</h3>
+    <ul class="tight">
+      <li>PKs: <code class="inline">BIGSERIAL</code> (or <code class="inline">BIGINT GENERATED ALWAYS AS IDENTITY</code>).</li>
+      <li>Audit columns on every table: <code class="inline">created_by, created_at, updated_by, updated_at, deleted_at</code> (soft delete). <strong>Log tables are append-only</strong> — no <code class="inline">updated_*</code>.</li>
+      <li>Tenant discriminator: <code class="inline">org_id</code> NOT NULL + RLS policy <code class="inline">org_id = current_setting('app.org_id')::bigint</code>.</li>
+      <li>High-volume tables (attendance, audit_logs, api_logs, notifications) are <strong>range-partitioned by month</strong>.</li>
+      <li>Money as <code class="inline">NUMERIC(14,2)</code>; never floats.</li>
+    </ul>
+
+    <h3>14.2 Core Tenancy &amp; Identity</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> organizations (
+  id              <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,            <span class="com">-- Tenant primary key</span>
+  name            <span class="kw">VARCHAR</span>(<span class="num2">150</span>) <span class="kw">NOT NULL</span>,            <span class="com">-- School/group name</span>
+  code            <span class="kw">VARCHAR</span>(<span class="num2">40</span>)  <span class="kw">NOT NULL UNIQUE</span>,     <span class="com">-- Short unique tenant code</span>
+  subdomain       <span class="kw">VARCHAR</span>(<span class="num2">60</span>)  <span class="kw">UNIQUE</span>,              <span class="com">-- White-label subdomain</span>
+  plan            <span class="kw">VARCHAR</span>(<span class="num2">20</span>)  <span class="kw">NOT NULL DEFAULT</span> <span class="str">'STARTER'</span>, <span class="com">-- STARTER|PRO|ENTERPRISE</span>
+  status          <span class="kw">VARCHAR</span>(<span class="num2">20</span>)  <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ACTIVE'</span>,  <span class="com">-- ACTIVE|SUSPENDED|TRIAL</span>
+  max_students    <span class="kw">INT</span>          <span class="kw">NOT NULL DEFAULT</span> <span class="num2">1000</span>,     <span class="com">-- Plan quota</span>
+  region          <span class="kw">VARCHAR</span>(<span class="num2">20</span>)  <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ap-south-1'</span>, <span class="com">-- Data residency</span>
+  settings        <span class="kw">JSONB</span>        <span class="kw">NOT NULL DEFAULT</span> <span class="str">'{}'</span>,      <span class="com">-- Branding/feature flags</span>
+  created_by      <span class="kw">BIGINT</span>,
+  created_at      <span class="kw">TIMESTAMPTZ</span>  <span class="kw">NOT NULL DEFAULT</span> now(),
+  updated_by      <span class="kw">BIGINT</span>,
+  updated_at      <span class="kw">TIMESTAMPTZ</span>,
+  deleted_at      <span class="kw">TIMESTAMPTZ</span>
+);
+<span class="kw">COMMENT ON TABLE</span> organizations <span class="kw">IS</span> <span class="str">'Top-level SaaS tenant'</span>;
+<span class="kw">COMMENT ON COLUMN</span> organizations.settings <span class="kw">IS</span> <span class="str">'JSONB: logo, theme, enabled modules'</span>;
+
+<span class="kw">CREATE TABLE</span> branches (
+  id              <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id          <span class="kw">BIGINT</span> <span class="kw">NOT NULL REFERENCES</span> organizations(id),
+  name            <span class="kw">VARCHAR</span>(<span class="num2">150</span>) <span class="kw">NOT NULL</span>,
+  code            <span class="kw">VARCHAR</span>(<span class="num2">40</span>)  <span class="kw">NOT NULL</span>,
+  address         <span class="kw">TEXT</span>,
+  city            <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  timezone        <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'Asia/Kolkata'</span>,
+  status          <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ACTIVE'</span>,
+  created_by <span class="kw">BIGINT</span>, created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  updated_by <span class="kw">BIGINT</span>, updated_at <span class="kw">TIMESTAMPTZ</span>, deleted_at <span class="kw">TIMESTAMPTZ</span>,
+  <span class="kw">UNIQUE</span>(org_id, code)
+);
+<span class="kw">CREATE INDEX</span> idx_branches_org <span class="kw">ON</span> branches(org_id) <span class="kw">WHERE</span> deleted_at <span class="kw">IS NULL</span>;
+
+<span class="kw">CREATE TABLE</span> users (
+  id              <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id          <span class="kw">BIGINT</span> <span class="kw">NOT NULL REFERENCES</span> organizations(id),
+  branch_id       <span class="kw">BIGINT REFERENCES</span> branches(id),     <span class="com">-- NULL for org-level users</span>
+  username        <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  email           <span class="kw">VARCHAR</span>(<span class="num2">160</span>) <span class="kw">NOT NULL</span>,
+  phone           <span class="kw">VARCHAR</span>(<span class="num2">20</span>),
+  password_hash   <span class="kw">VARCHAR</span>(<span class="num2">255</span>) <span class="kw">NOT NULL</span>,           <span class="com">-- bcrypt/argon2</span>
+  status          <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ACTIVE'</span>,
+  mfa_enabled     <span class="kw">BOOLEAN NOT NULL DEFAULT</span> <span class="kw">false</span>,
+  last_login_at   <span class="kw">TIMESTAMPTZ</span>,
+  created_by <span class="kw">BIGINT</span>, created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  updated_by <span class="kw">BIGINT</span>, updated_at <span class="kw">TIMESTAMPTZ</span>, deleted_at <span class="kw">TIMESTAMPTZ</span>,
+  <span class="kw">UNIQUE</span>(org_id, email)
+);
+<span class="kw">CREATE INDEX</span> idx_users_org_branch <span class="kw">ON</span> users(org_id, branch_id);
+
+<span class="kw">CREATE TABLE</span> roles (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id      <span class="kw">BIGINT REFERENCES</span> organizations(id),    <span class="com">-- NULL = system role</span>
+  name        <span class="kw">VARCHAR</span>(<span class="num2">60</span>) <span class="kw">NOT NULL</span>,
+  slug        <span class="kw">VARCHAR</span>(<span class="num2">60</span>) <span class="kw">NOT NULL</span>,             <span class="com">-- e.g. CLASS_TEACHER</span>
+  is_system   <span class="kw">BOOLEAN NOT NULL DEFAULT</span> <span class="kw">false</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">UNIQUE</span>(org_id, slug)
+);
+
+<span class="kw">CREATE TABLE</span> permissions (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  code        <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL UNIQUE</span>,      <span class="com">-- module.action e.g. fee.collect</span>
+  module      <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,
+  description <span class="kw">VARCHAR</span>(<span class="num2">160</span>)
+);
+
+<span class="kw">CREATE TABLE</span> role_permissions (
+  role_id       <span class="kw">BIGINT NOT NULL REFERENCES</span> roles(id) <span class="kw">ON DELETE CASCADE</span>,
+  permission_id <span class="kw">BIGINT NOT NULL REFERENCES</span> permissions(id) <span class="kw">ON DELETE CASCADE</span>,
+  <span class="kw">PRIMARY KEY</span>(role_id, permission_id)
+);
+
+<span class="kw">CREATE TABLE</span> user_roles (
+  user_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> users(id) <span class="kw">ON DELETE CASCADE</span>,
+  role_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> roles(id),
+  branch_id <span class="kw">BIGINT REFERENCES</span> branches(id),  <span class="com">-- scope of this assignment</span>
+  <span class="kw">PRIMARY KEY</span>(user_id, role_id, branch_id)
+);</code></pre>
+
+    <h3>14.3 Academic Structure</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> academic_years (
+  id         <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id     <span class="kw">BIGINT NOT NULL REFERENCES</span> organizations(id),
+  branch_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> branches(id),
+  name       <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL</span>,            <span class="com">-- "2026-2027"</span>
+  start_date <span class="kw">DATE NOT NULL</span>, end_date <span class="kw">DATE NOT NULL</span>,
+  is_current <span class="kw">BOOLEAN NOT NULL DEFAULT</span> <span class="kw">false</span>,
+  created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">UNIQUE</span>(branch_id, name)
+);
+
+<span class="kw">CREATE TABLE</span> classes (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id      <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL REFERENCES</span> branches(id),
+  name        <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,            <span class="com">-- "Grade 5"</span>
+  numeric_grade <span class="kw">INT</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">UNIQUE</span>(branch_id, name)
+);
+
+<span class="kw">CREATE TABLE</span> sections (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id      <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  class_id    <span class="kw">BIGINT NOT NULL REFERENCES</span> classes(id),
+  name        <span class="kw">VARCHAR</span>(<span class="num2">10</span>) <span class="kw">NOT NULL</span>,            <span class="com">-- "A"</span>
+  class_teacher_id <span class="kw">BIGINT REFERENCES</span> users(id),
+  capacity    <span class="kw">INT DEFAULT</span> <span class="num2">40</span>,
+  <span class="kw">UNIQUE</span>(class_id, name)
+);
+
+<span class="kw">CREATE TABLE</span> subjects (
+  id        <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id    <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  name      <span class="kw">VARCHAR</span>(<span class="num2">60</span>) <span class="kw">NOT NULL</span>,
+  code      <span class="kw">VARCHAR</span>(<span class="num2">20</span>),
+  is_elective <span class="kw">BOOLEAN DEFAULT</span> <span class="kw">false</span>,
+  <span class="kw">UNIQUE</span>(branch_id, name)
+);</code></pre>
+
+    <h3>14.4 People — Students, Parents, Employees</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> students (
+  id            <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id        <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL REFERENCES</span> branches(id),
+  user_id       <span class="kw">BIGINT REFERENCES</span> users(id),        <span class="com">-- login account (optional)</span>
+  admission_no  <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,
+  first_name    <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>, last_name <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  dob           <span class="kw">DATE NOT NULL</span>, gender <span class="kw">VARCHAR</span>(<span class="num2">10</span>),
+  class_id      <span class="kw">BIGINT REFERENCES</span> classes(id),
+  section_id    <span class="kw">BIGINT REFERENCES</span> sections(id),
+  academic_year_id <span class="kw">BIGINT REFERENCES</span> academic_years(id),
+  roll_no       <span class="kw">VARCHAR</span>(<span class="num2">10</span>),
+  photo_key     <span class="kw">VARCHAR</span>(<span class="num2">255</span>),                  <span class="com">-- S3 object key</span>
+  status        <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ACTIVE'</span>,
+  created_by <span class="kw">BIGINT</span>, created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  updated_by <span class="kw">BIGINT</span>, updated_at <span class="kw">TIMESTAMPTZ</span>, deleted_at <span class="kw">TIMESTAMPTZ</span>,
+  <span class="kw">UNIQUE</span>(org_id, branch_id, admission_no)
+);
+<span class="kw">CREATE INDEX</span> idx_students_section <span class="kw">ON</span> students(section_id) <span class="kw">WHERE</span> deleted_at <span class="kw">IS NULL</span>;
+<span class="kw">CREATE INDEX</span> idx_students_name <span class="kw">ON</span> students <span class="kw">USING</span> gin (to_tsvector(<span class="str">'simple'</span>, first_name||<span class="str">' '</span>||last_name));
+
+<span class="kw">CREATE TABLE</span> parents (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id      <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  user_id     <span class="kw">BIGINT REFERENCES</span> users(id),
+  first_name  <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>, last_name <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  email       <span class="kw">VARCHAR</span>(<span class="num2">160</span>), phone <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL</span>,
+  occupation  <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+
+<span class="kw">CREATE TABLE</span> student_parents (
+  student_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id) <span class="kw">ON DELETE CASCADE</span>,
+  parent_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> parents(id),
+  relation    <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL</span>,           <span class="com">-- FATHER|MOTHER|GUARDIAN</span>
+  is_primary  <span class="kw">BOOLEAN NOT NULL DEFAULT</span> <span class="kw">false</span>,
+  <span class="kw">PRIMARY KEY</span>(student_id, parent_id)
+);
+
+<span class="kw">CREATE TABLE</span> employees (
+  id            <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id        <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL REFERENCES</span> branches(id),
+  user_id       <span class="kw">BIGINT REFERENCES</span> users(id),
+  employee_code <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,
+  first_name    <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>, last_name <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  designation   <span class="kw">VARCHAR</span>(<span class="num2">80</span>), department <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  type          <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'TEACHING'</span>, <span class="com">-- TEACHING|NON_TEACHING</span>
+  date_of_join  <span class="kw">DATE</span>, phone <span class="kw">VARCHAR</span>(<span class="num2">20</span>), email <span class="kw">VARCHAR</span>(<span class="num2">160</span>),
+  status        <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'ACTIVE'</span>,
+  created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(), deleted_at <span class="kw">TIMESTAMPTZ</span>,
+  <span class="kw">UNIQUE</span>(org_id, employee_code)
+);
+
+<span class="com">-- teacher_subjects: which teacher teaches which subject to which section</span>
+<span class="kw">CREATE TABLE</span> teacher_subjects (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  employee_id <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  subject_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> subjects(id),
+  section_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> sections(id),
+  <span class="kw">UNIQUE</span>(employee_id, subject_id, section_id)
+);</code></pre>
+
+    <h3>14.5 Attendance (Partitioned)</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> student_attendance (
+  id           <span class="kw">BIGSERIAL</span>,
+  org_id       <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  student_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  section_id   <span class="kw">BIGINT NOT NULL</span>,
+  att_date     <span class="kw">DATE NOT NULL</span>,
+  status       <span class="kw">VARCHAR</span>(<span class="num2">10</span>) <span class="kw">NOT NULL</span>,          <span class="com">-- PRESENT|ABSENT|LATE|LEAVE</span>
+  marked_by    <span class="kw">BIGINT REFERENCES</span> users(id),
+  created_at   <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">PRIMARY KEY</span>(id, att_date),
+  <span class="kw">UNIQUE</span>(student_id, att_date)
+) <span class="kw">PARTITION BY RANGE</span> (att_date);
+<span class="com">-- monthly partitions e.g.</span>
+<span class="kw">CREATE TABLE</span> student_attendance_2026_06 <span class="kw">PARTITION OF</span> student_attendance
+  <span class="kw">FOR VALUES FROM</span> (<span class="str">'2026-06-01'</span>) <span class="kw">TO</span> (<span class="str">'2026-07-01'</span>);
+<span class="kw">CREATE INDEX</span> idx_satt_section_date <span class="kw">ON</span> student_attendance(section_id, att_date);
+
+<span class="kw">CREATE TABLE</span> employee_attendance (
+  id           <span class="kw">BIGSERIAL</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  employee_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  att_date     <span class="kw">DATE NOT NULL</span>,
+  check_in     <span class="kw">TIMESTAMPTZ</span>, check_out <span class="kw">TIMESTAMPTZ</span>,
+  status       <span class="kw">VARCHAR</span>(<span class="num2">10</span>) <span class="kw">NOT NULL</span>,
+  source       <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">DEFAULT</span> <span class="str">'MANUAL'</span>,    <span class="com">-- MANUAL|BIOMETRIC|RFID</span>
+  <span class="kw">PRIMARY KEY</span>(id, att_date),
+  <span class="kw">UNIQUE</span>(employee_id, att_date)
+) <span class="kw">PARTITION BY RANGE</span> (att_date);</code></pre>
+
+    <h3>14.6 Academics — Homework, Assignment, Exam, Marks</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> homeworks (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  section_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> sections(id),
+  subject_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> subjects(id),
+  teacher_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  title       <span class="kw">VARCHAR</span>(<span class="num2">160</span>) <span class="kw">NOT NULL</span>, description <span class="kw">TEXT</span>,
+  attachment_key <span class="kw">VARCHAR</span>(<span class="num2">255</span>),
+  due_date    <span class="kw">DATE NOT NULL</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+
+<span class="kw">CREATE TABLE</span> assignments (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  section_id  <span class="kw">BIGINT NOT NULL</span>, subject_id <span class="kw">BIGINT NOT NULL</span>,
+  teacher_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  title       <span class="kw">VARCHAR</span>(<span class="num2">160</span>) <span class="kw">NOT NULL</span>, max_marks <span class="kw">INT</span>,
+  due_date    <span class="kw">DATE NOT NULL</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+<span class="kw">CREATE TABLE</span> assignment_submissions (
+  id            <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  assignment_id <span class="kw">BIGINT NOT NULL REFERENCES</span> assignments(id),
+  student_id    <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  file_key      <span class="kw">VARCHAR</span>(<span class="num2">255</span>), submitted_at <span class="kw">TIMESTAMPTZ</span>,
+  marks_awarded <span class="kw">NUMERIC</span>(<span class="num2">6</span>,<span class="num2">2</span>), feedback <span class="kw">TEXT</span>,
+  <span class="kw">UNIQUE</span>(assignment_id, student_id)
+);
+
+<span class="kw">CREATE TABLE</span> exam_master (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  academic_year_id <span class="kw">BIGINT NOT NULL REFERENCES</span> academic_years(id),
+  name        <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>,           <span class="com">-- "Term 1 Final"</span>
+  exam_type   <span class="kw">VARCHAR</span>(<span class="num2">20</span>),                     <span class="com">-- UNIT|TERM|FINAL</span>
+  start_date  <span class="kw">DATE</span>, end_date <span class="kw">DATE</span>,
+  status      <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'DRAFT'</span>, <span class="com">-- DRAFT|ONGOING|PUBLISHED</span>
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+<span class="kw">CREATE TABLE</span> exam_schedules (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  exam_id     <span class="kw">BIGINT NOT NULL REFERENCES</span> exam_master(id),
+  class_id    <span class="kw">BIGINT NOT NULL</span>, subject_id <span class="kw">BIGINT NOT NULL</span>,
+  exam_date   <span class="kw">DATE</span>, max_marks <span class="kw">NUMERIC</span>(<span class="num2">6</span>,<span class="num2">2</span>), pass_marks <span class="kw">NUMERIC</span>(<span class="num2">6</span>,<span class="num2">2</span>)
+);
+<span class="kw">CREATE TABLE</span> student_marks (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  exam_id     <span class="kw">BIGINT NOT NULL REFERENCES</span> exam_master(id),
+  schedule_id <span class="kw">BIGINT NOT NULL REFERENCES</span> exam_schedules(id),
+  student_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  marks_obtained <span class="kw">NUMERIC</span>(<span class="num2">6</span>,<span class="num2">2</span>),
+  grade       <span class="kw">VARCHAR</span>(<span class="num2">5</span>), is_absent <span class="kw">BOOLEAN DEFAULT</span> <span class="kw">false</span>,
+  entered_by  <span class="kw">BIGINT REFERENCES</span> users(id),
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">UNIQUE</span>(schedule_id, student_id)
+);</code></pre>
+
+    <h3>14.7 Fees &amp; Finance</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> fee_structure (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  academic_year_id <span class="kw">BIGINT NOT NULL REFERENCES</span> academic_years(id),
+  class_id    <span class="kw">BIGINT REFERENCES</span> classes(id),
+  name        <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>,           <span class="com">-- "Tuition - Term 1"</span>
+  frequency   <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL</span>,           <span class="com">-- MONTHLY|TERM|ANNUAL|ONE_TIME</span>
+  amount      <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">NOT NULL</span>,
+  due_date    <span class="kw">DATE</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+<span class="kw">CREATE TABLE</span> student_fees (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  student_id  <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  fee_structure_id <span class="kw">BIGINT NOT NULL REFERENCES</span> fee_structure(id),
+  amount_due  <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">NOT NULL</span>,
+  amount_paid <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="num2">0</span>,
+  discount    <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">DEFAULT</span> <span class="num2">0</span>,
+  status      <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'PENDING'</span>, <span class="com">-- PENDING|PARTIAL|PAID|OVERDUE</span>
+  due_date    <span class="kw">DATE</span>,
+  <span class="kw">UNIQUE</span>(student_id, fee_structure_id)
+);
+<span class="kw">CREATE INDEX</span> idx_studentfees_status <span class="kw">ON</span> student_fees(branch_id, status);
+
+<span class="kw">CREATE TABLE</span> fee_payments (
+  id            <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  student_fee_id <span class="kw">BIGINT NOT NULL REFERENCES</span> student_fees(id),
+  receipt_no    <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,
+  amount        <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">NOT NULL</span>,
+  method        <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL</span>,        <span class="com">-- CASH|CARD|UPI|ONLINE|CHEQUE</span>
+  gateway_ref   <span class="kw">VARCHAR</span>(<span class="num2">120</span>),
+  status        <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'SUCCESS'</span>,
+  paid_at       <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  collected_by  <span class="kw">BIGINT REFERENCES</span> users(id),
+  receipt_key   <span class="kw">VARCHAR</span>(<span class="num2">255</span>),                  <span class="com">-- S3 PDF key</span>
+  <span class="kw">UNIQUE</span>(org_id, receipt_no)
+);</code></pre>
+
+    <h3>14.8 Operations — Transport, Library, Hostel, Inventory</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> vehicles (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  reg_number  <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL</span>, capacity <span class="kw">INT</span>,
+  driver_name <span class="kw">VARCHAR</span>(<span class="num2">80</span>), driver_phone <span class="kw">VARCHAR</span>(<span class="num2">20</span>),
+  gps_device_id <span class="kw">VARCHAR</span>(<span class="num2">60</span>), status <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">DEFAULT</span> <span class="str">'ACTIVE'</span>,
+  <span class="kw">UNIQUE</span>(org_id, reg_number)
+);
+<span class="kw">CREATE TABLE</span> routes (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  name        <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>,
+  vehicle_id  <span class="kw">BIGINT REFERENCES</span> vehicles(id),
+  stops       <span class="kw">JSONB NOT NULL DEFAULT</span> <span class="str">'[]'</span>   <span class="com">-- [{name,lat,lng,time}]</span>
+);
+<span class="kw">CREATE TABLE</span> transport_allocations (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  student_id <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  route_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> routes(id),
+  stop_name  <span class="kw">VARCHAR</span>(<span class="num2">80</span>),
+  <span class="kw">UNIQUE</span>(student_id)
+);
+
+<span class="kw">CREATE TABLE</span> books (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  isbn        <span class="kw">VARCHAR</span>(<span class="num2">20</span>), title <span class="kw">VARCHAR</span>(<span class="num2">200</span>) <span class="kw">NOT NULL</span>,
+  author      <span class="kw">VARCHAR</span>(<span class="num2">120</span>), category <span class="kw">VARCHAR</span>(<span class="num2">60</span>),
+  total_copies <span class="kw">INT NOT NULL DEFAULT</span> <span class="num2">1</span>, available_copies <span class="kw">INT NOT NULL DEFAULT</span> <span class="num2">1</span>
+);
+<span class="kw">CREATE TABLE</span> book_issues (
+  id        <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  book_id   <span class="kw">BIGINT NOT NULL REFERENCES</span> books(id),
+  student_id <span class="kw">BIGINT REFERENCES</span> students(id),
+  issued_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  due_date  <span class="kw">DATE NOT NULL</span>, returned_at <span class="kw">TIMESTAMPTZ</span>,
+  fine      <span class="kw">NUMERIC</span>(<span class="num2">10</span>,<span class="num2">2</span>) <span class="kw">DEFAULT</span> <span class="num2">0</span>
+);
+
+<span class="kw">CREATE TABLE</span> hostels (
+  id        <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  name      <span class="kw">VARCHAR</span>(<span class="num2">80</span>) <span class="kw">NOT NULL</span>, type <span class="kw">VARCHAR</span>(<span class="num2">10</span>), <span class="com">-- BOYS|GIRLS</span>
+  warden_id <span class="kw">BIGINT REFERENCES</span> employees(id)
+);
+<span class="kw">CREATE TABLE</span> hostel_rooms (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>, hostel_id <span class="kw">BIGINT NOT NULL REFERENCES</span> hostels(id),
+  room_no <span class="kw">VARCHAR</span>(<span class="num2">20</span>), capacity <span class="kw">INT NOT NULL DEFAULT</span> <span class="num2">2</span>, occupied <span class="kw">INT NOT NULL DEFAULT</span> <span class="num2">0</span>
+);
+<span class="kw">CREATE TABLE</span> hostel_allocations (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  room_id <span class="kw">BIGINT NOT NULL REFERENCES</span> hostel_rooms(id),
+  student_id <span class="kw">BIGINT NOT NULL REFERENCES</span> students(id),
+  allocated_at <span class="kw">DATE NOT NULL DEFAULT</span> <span class="kw">CURRENT_DATE</span>, vacated_at <span class="kw">DATE</span>
+);
+
+<span class="kw">CREATE TABLE</span> inventory_items (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  name <span class="kw">VARCHAR</span>(<span class="num2">120</span>) <span class="kw">NOT NULL</span>, category <span class="kw">VARCHAR</span>(<span class="num2">60</span>),
+  quantity <span class="kw">INT NOT NULL DEFAULT</span> <span class="num2">0</span>, unit <span class="kw">VARCHAR</span>(<span class="num2">20</span>), reorder_level <span class="kw">INT DEFAULT</span> <span class="num2">0</span>
+);</code></pre>
+
+    <h3>14.9 HR — Leave &amp; Payroll</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> leave_requests (
+  id          <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  employee_id <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  leave_type  <span class="kw">VARCHAR</span>(<span class="num2">20</span>) <span class="kw">NOT NULL</span>, from_date <span class="kw">DATE</span>, to_date <span class="kw">DATE</span>,
+  reason      <span class="kw">TEXT</span>, status <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'PENDING'</span>,
+  approved_by <span class="kw">BIGINT REFERENCES</span> users(id),
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+<span class="kw">CREATE TABLE</span> salary_structures (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  employee_id <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  basic <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">NOT NULL</span>, hra <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>) <span class="kw">DEFAULT</span> <span class="num2">0</span>,
+  allowances <span class="kw">JSONB DEFAULT</span> <span class="str">'{}'</span>, deductions <span class="kw">JSONB DEFAULT</span> <span class="str">'{}'</span>,
+  effective_from <span class="kw">DATE NOT NULL</span>
+);
+<span class="kw">CREATE TABLE</span> payroll_runs (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT NOT NULL</span>,
+  period <span class="kw">VARCHAR</span>(<span class="num2">7</span>) <span class="kw">NOT NULL</span>,            <span class="com">-- "2026-06"</span>
+  status <span class="kw">VARCHAR</span>(<span class="num2">15</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'DRAFT'</span>,
+  created_at <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now()
+);
+<span class="kw">CREATE TABLE</span> payslips (
+  id <span class="kw">BIGSERIAL</span> <span class="kw">PRIMARY KEY</span>,
+  payroll_run_id <span class="kw">BIGINT NOT NULL REFERENCES</span> payroll_runs(id),
+  employee_id <span class="kw">BIGINT NOT NULL REFERENCES</span> employees(id),
+  gross <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>), deductions <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>), net <span class="kw">NUMERIC</span>(<span class="num2">14</span>,<span class="num2">2</span>),
+  pdf_key <span class="kw">VARCHAR</span>(<span class="num2">255</span>),
+  <span class="kw">UNIQUE</span>(payroll_run_id, employee_id)
+);</code></pre>
+
+    <h3>14.10 Engagement &amp; System — Notifications, Audit, API Logs</h3>
+    <pre><code><span class="kw">CREATE TABLE</span> notifications (
+  id          <span class="kw">BIGSERIAL</span>,
+  org_id <span class="kw">BIGINT NOT NULL</span>, branch_id <span class="kw">BIGINT</span>,
+  user_id     <span class="kw">BIGINT REFERENCES</span> users(id),
+  channel     <span class="kw">VARCHAR</span>(<span class="num2">10</span>) <span class="kw">NOT NULL</span>,         <span class="com">-- INAPP|EMAIL|SMS|PUSH</span>
+  title       <span class="kw">VARCHAR</span>(<span class="num2">160</span>), body <span class="kw">TEXT</span>,
+  status      <span class="kw">VARCHAR</span>(<span class="num2">12</span>) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'QUEUED'</span>, <span class="com">-- QUEUED|SENT|FAILED|READ</span>
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">PRIMARY KEY</span>(id, created_at)
+) <span class="kw">PARTITION BY RANGE</span> (created_at);
+
+<span class="com">-- AUDIT LOG: append-only, never updated/deleted</span>
+<span class="kw">CREATE TABLE</span> audit_logs (
+  id          <span class="kw">BIGSERIAL</span>,
+  org_id <span class="kw">BIGINT</span>, branch_id <span class="kw">BIGINT</span>,
+  user_id     <span class="kw">BIGINT</span>,
+  action      <span class="kw">VARCHAR</span>(<span class="num2">40</span>) <span class="kw">NOT NULL</span>,         <span class="com">-- CREATE|UPDATE|DELETE|LOGIN</span>
+  entity      <span class="kw">VARCHAR</span>(<span class="num2">60</span>) <span class="kw">NOT NULL</span>,         <span class="com">-- 'students'</span>
+  entity_id   <span class="kw">BIGINT</span>,
+  old_value   <span class="kw">JSONB</span>, new_value <span class="kw">JSONB</span>,
+  ip_address  <span class="kw">INET</span>, user_agent <span class="kw">VARCHAR</span>(<span class="num2">255</span>),
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">PRIMARY KEY</span>(id, created_at)
+) <span class="kw">PARTITION BY RANGE</span> (created_at);
+<span class="kw">CREATE INDEX</span> idx_audit_entity <span class="kw">ON</span> audit_logs(org_id, entity, entity_id);
+
+<span class="com">-- API LOG: append-only request/response metadata</span>
+<span class="kw">CREATE TABLE</span> api_logs (
+  id          <span class="kw">BIGSERIAL</span>,
+  org_id <span class="kw">BIGINT</span>, user_id <span class="kw">BIGINT</span>,
+  method      <span class="kw">VARCHAR</span>(<span class="num2">8</span>), path <span class="kw">VARCHAR</span>(<span class="num2">255</span>),
+  status_code <span class="kw">INT</span>, latency_ms <span class="kw">INT</span>,
+  request_id  <span class="kw">VARCHAR</span>(<span class="num2">40</span>), ip_address <span class="kw">INET</span>,
+  created_at  <span class="kw">TIMESTAMPTZ NOT NULL DEFAULT</span> now(),
+  <span class="kw">PRIMARY KEY</span>(id, created_at)
+) <span class="kw">PARTITION BY RANGE</span> (created_at);</code></pre>
+
+    <h3>14.11 Index &amp; Partition Strategy</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Table</th><th>Strategy</th></tr>
+      <tr><td>All tenant tables</td><td>Composite index leading with <code class="inline">org_id</code>/<code class="inline">branch_id</code> to align with RLS &amp; queries.</td></tr>
+      <tr><td>students</td><td>B-tree on <code class="inline">section_id</code>; GIN full-text on name; partial index <code class="inline">WHERE deleted_at IS NULL</code>.</td></tr>
+      <tr><td>student_attendance</td><td>Range partition by month; index <code class="inline">(section_id, att_date)</code>; unique <code class="inline">(student_id, att_date)</code>.</td></tr>
+      <tr><td>student_fees</td><td>Index <code class="inline">(branch_id, status)</code> for outstanding queries.</td></tr>
+      <tr><td>audit_logs / api_logs / notifications</td><td>Monthly partitions, drop/archive old partitions to cold storage.</td></tr>
+      <tr><td>fee_payments</td><td>Unique <code class="inline">(org_id, receipt_no)</code>; index on <code class="inline">paid_at</code> for reports.</td></tr>
+    </table></div>
+    <h4>Sample Data</h4>
+    <pre><code><span class="kw">INSERT INTO</span> organizations(name,code,plan,max_students)
+ <span class="kw">VALUES</span>(<span class="str">'Delhi Public School Group'</span>,<span class="str">'DPSG'</span>,<span class="str">'ENTERPRISE'</span>,<span class="num2">50000</span>);
+<span class="kw">INSERT INTO</span> branches(org_id,name,code) <span class="kw">VALUES</span>(<span class="num2">1</span>,<span class="str">'DPS Whitefield'</span>,<span class="str">'DPS-WF'</span>);
+<span class="kw">INSERT INTO</span> classes(org_id,branch_id,name,numeric_grade) <span class="kw">VALUES</span>(<span class="num2">1</span>,<span class="num2">1</span>,<span class="str">'Grade 5'</span>,<span class="num2">5</span>);
+<span class="kw">INSERT INTO</span> students(org_id,branch_id,admission_no,first_name,dob,class_id)
+ <span class="kw">VALUES</span>(<span class="num2">1</span>,<span class="num2">1</span>,<span class="str">'2026-00187'</span>,<span class="str">'Aarav'</span>,<span class="str">'2014-05-21'</span>,<span class="num2">1</span>);</code></pre>
+  </section>
+
+  <!-- ============ 15. ER ============ -->
+  <section id="er">
+    <h2 class="sec"><span class="num">15</span> Entity-Relationship Diagram</h2>
+    <div class="diagram">
+organizations 1──∞ branches 1──∞ academic_years
+     │                │
+     │ 1              │ 1──∞ classes 1──∞ sections ∞──1 employees(class_teacher)
+     │                │              │
+     ∞                │              1──∞ subjects
+   users 1──∞ user_roles ∞──1 roles ∞──∞ permissions (via role_permissions)
+     │
+     ├─1──∞ students ∞──∞ parents (via student_parents)
+     │        │
+     │        ├─1──∞ student_attendance
+     │        ├─1──∞ student_marks ∞──1 exam_master 1──∞ exam_schedules
+     │        ├─1──∞ student_fees ∞──1 fee_structure
+     │        │        └─1──∞ fee_payments
+     │        ├─1──∞ assignment_submissions ∞──1 assignments
+     │        ├─1──1 transport_allocations ∞──1 routes ∞──1 vehicles
+     │        ├─1──∞ hostel_allocations ∞──1 hostel_rooms ∞──1 hostels
+     │        └─1──∞ book_issues ∞──1 books
+     │
+     └─1──∞ employees 1──∞ employee_attendance
+              ├─1──∞ teacher_subjects ∞──1 subjects/sections
+              ├─1──∞ leave_requests
+              └─1──1 salary_structures → payslips ∞──1 payroll_runs
+
+  (cross-cutting) audit_logs · api_logs · notifications · documents  → org_id/user_id
+    </div>
+  </section>
+
+  <!-- ============ 16. MODULE SPECS ============ -->
+  <section id="modspec">
+    <h2 class="sec"><span class="num">16</span> Module Specifications</h2>
+    <p class="lead">Each module documented with Purpose, Business Flow, Features, Roles, Tables, Relationships, APIs, Validations, Audit and Reports. Representative modules detailed below; the same template applies to all 30.</p>
+
+    <!-- Student -->
+    <h3>16.1 Student Management</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Purpose</td><td>Maintain the complete lifecycle of a student from admission to graduation/transfer.</td></tr>
+      <tr><td>Business Flow</td><td>Admission → Enrollment (class/section/roll) → Parent linkage → Promotion/Transfer → Alumni/Inactive.</td></tr>
+      <tr><td>Features</td><td>CRUD, photo upload (S3), bulk import, ID-card generation, promotion, TC issue, document vault.</td></tr>
+      <tr><td>Roles</td><td><span class="pill role">Branch Admin</span><span class="pill role">Principal</span><span class="pill role">Class Teacher (read)</span><span class="pill role">Parent (own)</span></td></tr>
+      <tr><td>Tables</td><td>students, student_parents, parents, classes, sections, academic_years, documents.</td></tr>
+      <tr><td>Relationships</td><td>students ∞–1 sections; students ∞–∞ parents; students 1–∞ (attendance, fees, marks).</td></tr>
+      <tr><td>APIs</td><td>CRUD /students, /students/import, /students/{id}/promote, /students/{id}/documents.</td></tr>
+      <tr><td>Validations</td><td>Unique admission_no per branch; valid DOB/age; section belongs to class; roll unique in section.</td></tr>
+      <tr><td>Audit</td><td>Every create/update/delete/promote logged with old/new JSON.</td></tr>
+      <tr><td>Reports</td><td>Student directory, class strength, demographics, dropout, promotion list.</td></tr>
+    </table></div>
+
+    <!-- Fees -->
+    <h3>16.2 Fees Management</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Purpose</td><td>Define fee structures, generate dues, collect online/offline, issue receipts, track outstanding.</td></tr>
+      <tr><td>Business Flow</td><td>Define structure → Generate student dues → Collect (gateway/cash) → Receipt → Reconcile → Dunning.</td></tr>
+      <tr><td>Features</td><td>Component-wise fees, discounts/scholarships, partial payment, online gateway, receipts (PDF→S3), refunds, reminders.</td></tr>
+      <tr><td>Roles</td><td><span class="pill role">Accountant</span><span class="pill role">Branch Admin</span><span class="pill role">Parent (pay)</span></td></tr>
+      <tr><td>Tables</td><td>fee_structure, student_fees, fee_payments.</td></tr>
+      <tr><td>APIs</td><td>CRUD /fee-structures, POST /fees/generate, /fees/{id}/pay, /fees/webhook, GET /fees/receipts/{id}.</td></tr>
+      <tr><td>Validations</td><td>amount &gt; 0; paid ≤ due; idempotent webhook (gateway_ref unique); receipt_no unique.</td></tr>
+      <tr><td>Audit</td><td>All payments &amp; refunds logged immutably with collector &amp; gateway ref.</td></tr>
+      <tr><td>Reports</td><td>Daily collection, outstanding/aging, defaulters, refund register, GL reconciliation.</td></tr>
+    </table></div>
+
+    <!-- Attendance -->
+    <h3>16.3 Attendance Management</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Purpose</td><td>Record &amp; analyze daily attendance for students &amp; employees.</td></tr>
+      <tr><td>Business Flow</td><td>Mark (manual/biometric) → Persist → Auto-notify absentees → Aggregate for reports/payroll.</td></tr>
+      <tr><td>Features</td><td>Section roll-call, period-wise (optional), biometric/RFID sync, monthly register, % analytics.</td></tr>
+      <tr><td>Roles</td><td><span class="pill role">Class Teacher</span><span class="pill role">Teacher</span><span class="pill role">HR (employee)</span></td></tr>
+      <tr><td>Tables</td><td>student_attendance (partitioned), employee_attendance (partitioned).</td></tr>
+      <tr><td>APIs</td><td>POST/GET /attendance/students, /attendance/employees, GET /attendance/summary.</td></tr>
+      <tr><td>Validations</td><td>One record per student/date; date not future; valid status enum; teacher owns section.</td></tr>
+      <tr><td>Audit</td><td>Mark/edit logged; edits after lock require approval.</td></tr>
+      <tr><td>Reports</td><td>Daily register, monthly %, chronic-absentee, staff attendance for payroll.</td></tr>
+    </table></div>
+
+    <!-- Exam -->
+    <h3>16.4 Examination Management</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Purpose</td><td>Configure exams, capture marks, compute grades/ranks, publish report cards.</td></tr>
+      <tr><td>Business Flow</td><td>Define exam → schedule papers → marks entry → grade/rank compute → principal approve → publish → report cards.</td></tr>
+      <tr><td>Roles</td><td><span class="pill role">Teacher</span><span class="pill role">Principal (publish)</span><span class="pill role">Parent/Student (view)</span></td></tr>
+      <tr><td>Tables</td><td>exam_master, exam_schedules, student_marks, grading_schemes.</td></tr>
+      <tr><td>APIs</td><td>CRUD /exams, POST /exams/{id}/marks, /exams/{id}/publish, GET /students/{id}/report-card.</td></tr>
+      <tr><td>Validations</td><td>marks ≤ max_marks; publish blocked until all entered &amp; approved; locked after publish.</td></tr>
+      <tr><td>Audit</td><td>Marks entry/edit, approval, publish all logged.</td></tr>
+      <tr><td>Reports</td><td>Mark sheet, report card, subject toppers, pass %, comparative analysis.</td></tr>
+    </table></div>
+
+    <!-- Transport -->
+    <h3>16.5 Transport Management</h3>
+    <div class="tbl-scroll"><table>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+      <tr><td>Purpose</td><td>Manage fleet, routes, allocations and live tracking for student safety.</td></tr>
+      <tr><td>Roles</td><td><span class="pill role">Transport Manager</span><span class="pill role">Parent (track)</span></td></tr>
+      <tr><td>Tables</td><td>vehicles, routes, transport_allocations.</td></tr>
+      <tr><td>APIs</td><td>CRUD /vehicles, /routes, POST /transport/allocate, GET /transport/track/{vehicleId}.</td></tr>
+      <tr><td>Validations</td><td>capacity not exceeded; one active allocation per student; valid GPS device.</td></tr>
+      <tr><td>Reports</td><td>Route occupancy, fee linkage, GPS history, geofence breaches.</td></tr>
+    </table></div>
+
+    <p style="color:var(--muted)">Remaining modules (Homework, Assignment, Library, Hostel, Inventory, Payroll, Leave, Finance, Communication, Notification, Event, Certificate, Admission, Visitor, Document, Report, Audit, plus Organization/Branch/User/Role/Permission/Parent/Employee/Teacher) follow the identical template — tables, APIs, validations, audit and reports are defined in §13–§14.</p>
+  </section>
+
+  <!-- ============ 17. BACKEND ============ -->
+  <section id="backend">
+    <h2 class="sec"><span class="num">17</span> Node.js Backend Structure</h2>
+    <pre><code>src/
+├── config/            <span class="com"># env, db pool, redis, s3, swagger</span>
+├── server.js          <span class="com"># express bootstrap, graceful shutdown</span>
+├── app.js             <span class="com"># middleware chain, route mounting</span>
+├── routes/            <span class="com"># v1/*.routes.js — endpoint → controller</span>
+│   ├── auth.routes.js
+│   ├── student.routes.js
+│   └── ...
+├── controllers/       <span class="com"># thin: parse req, call service, format res</span>
+├── services/          <span class="com"># business logic, transactions, orchestration</span>
+├── repositories/      <span class="com"># data access (SQL/ORM), tenant-scoped</span>
+├── models/            <span class="com"># entity definitions / schema mappers</span>
+├── validators/        <span class="com"># Joi/Zod schemas per endpoint</span>
+├── middlewares/
+│   ├── authenticate.js    <span class="com"># verify JWT → req.user</span>
+│   ├── authorize.js       <span class="com"># permission + tenant scope guard</span>
+│   ├── tenant.js          <span class="com"># set app.org_id (RLS context)</span>
+│   ├── auditLogger.js     <span class="com"># write audit_logs on mutations</span>
+│   ├── apiLogger.js       <span class="com"># write api_logs</span>
+│   ├── rateLimiter.js     <span class="com"># redis token bucket</span>
+│   ├── validate.js        <span class="com"># run validator, 400 on fail</span>
+│   └── errorHandler.js    <span class="com"># central error → envelope</span>
+├── jobs/              <span class="com"># bull processors</span>
+│   ├── queues.js          <span class="com"># queue definitions</span>
+│   ├── notification.job.js
+│   ├── report.job.js
+│   ├── import.job.js
+│   └── payroll.job.js
+├── utils/             <span class="com"># jwt, hash, s3, logger, pagination, response</span>
+├── db/                <span class="com"># migrations, seeds, rls policies</span>
+└── tests/             <span class="com"># unit + integration</span></code></pre>
+
+    <h3>17.1 Middleware Chain</h3>
+    <div class="diagram">request → requestId → apiLogger → rateLimiter → authenticate
+        → tenant(set RLS org_id) → authorize(permission) → validate(body)
+        → controller → service → repository → (DB / Redis / S3 / Queue)
+        ← response envelope ← auditLogger(on mutation) ← errorHandler(on throw)</div>
+
+    <h3>17.2 Authorize Middleware (illustrative)</h3>
+    <pre><code><span class="kw">const</span> <span class="fn">authorize</span> = (permission) => (req, res, next) => {
+  <span class="kw">const</span> { permissions, orgId } = req.user;          <span class="com">// from JWT + redis cache</span>
+  <span class="kw">if</span> (!permissions.includes(permission))
+    <span class="kw">return</span> next(<span class="kw">new</span> ForbiddenError(<span class="str">'FORBIDDEN'</span>));
+  <span class="com">// tenant scope already pinned via SET app.org_id; deny cross-tenant id</span>
+  next();
+};
+<span class="com">// usage: router.post('/students', authorize('student.create'),</span>
+<span class="com">//          validate(createStudentSchema), studentController.create);</span></code></pre>
+  </section>
+
+  <!-- ============ 18. SECURITY ============ -->
+  <section id="security">
+    <h2 class="sec"><span class="num">18</span> Security Architecture</h2>
+    <div class="tbl-scroll"><table>
+      <tr><th>Control</th><th>Implementation</th></tr>
+      <tr><td>Authentication</td><td>JWT access (15 min, RS256) + refresh (7 days, rotating, stored hashed in Redis with jti).</td></tr>
+      <tr><td>Refresh &amp; Revocation</td><td>Refresh rotation, reuse-detection (revoke family), logout invalidates jti, device list.</td></tr>
+      <tr><td>Password</td><td>bcrypt (cost 12) / argon2id, breach-check, complexity policy, history, lockout after N fails.</td></tr>
+      <tr><td>MFA</td><td>TOTP/Email OTP enforced for admin roles.</td></tr>
+      <tr><td>Authorization</td><td>RBAC permission checks per endpoint + Postgres RLS tenant isolation.</td></tr>
+      <tr><td>Rate Limiting</td><td>Redis token-bucket: global, per-IP, per-user; stricter on /auth.</td></tr>
+      <tr><td>SQL Injection</td><td>Parameterized queries / ORM bindings only; no string concat.</td></tr>
+      <tr><td>XSS</td><td>Output encoding, CSP headers, sanitize rich text, Angular default escaping.</td></tr>
+      <tr><td>CSRF</td><td>Bearer tokens (not cookies) for API; SameSite for any cookie usage.</td></tr>
+      <tr><td>Transport</td><td>TLS 1.2+ everywhere, HSTS, secure ciphers.</td></tr>
+      <tr><td>At-Rest</td><td>AES-256 (RDS + S3 SSE-KMS); secrets in AWS Secrets Manager.</td></tr>
+      <tr><td>File Upload</td><td>Presigned S3 PUT, MIME/extension allowlist, size cap, AV scan, no public ACL.</td></tr>
+      <tr><td>Headers</td><td>Helmet: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.</td></tr>
+      <tr><td>Audit &amp; API Logs</td><td>Immutable append-only, 7-year retention, tamper-evident.</td></tr>
+      <tr><td>Tenant Isolation</td><td>App tenant guard + RLS; integration tests assert zero cross-tenant reads.</td></tr>
+      <tr><td>Secrets &amp; Keys</td><td>KMS-managed signing keys, rotation, least-privilege IAM.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 19. DEPLOYMENT ============ -->
+  <section id="deploy">
+    <h2 class="sec"><span class="num">19</span> Deployment Architecture</h2>
+    <div class="diagram">
+                    ┌──────────────── Internet ────────────────┐
+                    │                                           │
+              [CloudFront CDN] ── static Angular (S3)     [Route 53 DNS]
+                    │                                           │
+              [WAF + ALB / NGINX Ingress]  ◀── TLS termination, rate limit
+                    │
+        ┌───────────┼─────────────────────────────┐
+        ▼           ▼                              ▼
+  [API Pods]   [API Pods]   ...        [Worker Pods (Bull consumers)]
+   (Express)    (Express)                (notifications/reports/imports)
+        │           │                              │
+        └─────┬─────┴───────────┬──────────────────┘
+              ▼                 ▼
+        [Redis Cluster]    [PostgreSQL Primary] ──stream──▶ [Read Replicas]
+        (cache/queue/      (Multi-AZ, PITR)                 (reporting reads)
+         sessions)              │
+                                ▼
+                          [S3 Buckets] (docs, receipts, reports, backups)
+
+  Cross-cutting: [CloudWatch/Prometheus + Grafana] · [ELK/OpenSearch logs]
+                 [Secrets Manager/KMS] · [CI/CD: GitHub Actions → ECR → EKS]</div>
+    <h3>19.1 Environments &amp; Scaling</h3>
+    <ul class="tight">
+      <li><strong>Environments:</strong> dev → staging → production, infra-as-code (Terraform), per-region.</li>
+      <li><strong>Autoscaling:</strong> HPA on CPU/req-latency for API &amp; worker pods; DB read replicas for reporting.</li>
+      <li><strong>Microservice-ready:</strong> modular monolith now; bounded contexts (Auth, Academics, Finance, Comms) extractable to services behind the same gateway.</li>
+      <li><strong>Caching:</strong> Redis for permissions, hot masters, dashboards; CDN for static + cacheable GETs.</li>
+      <li><strong>DR:</strong> automated daily snapshots + PITR; cross-region backup replication; RPO ≤ 5 min, RTO ≤ 30 min.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 20. ROADMAP ============ -->
+  <section id="roadmap">
+    <h2 class="sec"><span class="num">20</span> Development Roadmap</h2>
+    <div class="tbl-scroll"><table>
+      <tr><th>Phase</th><th>Duration</th><th>Scope</th></tr>
+      <tr><td>0 — Foundation</td><td>3–4 wks</td><td>Repo, CI/CD, infra (EKS/RDS/Redis/S3), auth, multi-tenancy + RLS, RBAC, audit/API logging, Swagger.</td></tr>
+      <tr><td>1 — Core Academic</td><td>5–6 wks</td><td>Org/Branch/User mgmt, academic structure, Student/Parent, Attendance, Homework/Assignment.</td></tr>
+      <tr><td>2 — Exams &amp; Fees</td><td>5–6 wks</td><td>Examination + report cards, Fees + payment gateway, Finance, notifications pipeline.</td></tr>
+      <tr><td>3 — Operations</td><td>5–6 wks</td><td>Library, Transport (+GPS), Hostel, Inventory, Visitor, Document/Certificate.</td></tr>
+      <tr><td>4 — HR &amp; Engagement</td><td>4–5 wks</td><td>Employee/Teacher, Leave, Payroll, Communication, Event, Reports/Analytics.</td></tr>
+      <tr><td>5 — Hardening &amp; GA</td><td>4 wks</td><td>Security review, load/perf testing, mobile app, billing, white-label, docs, go-live.</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ 21. CHECKLIST ============ -->
+  <section id="checklist">
+    <h2 class="sec"><span class="num">21</span> Production Readiness Checklist</h2>
+    <div class="two">
+      <div>
+        <h4>Functional</h4>
+        <ul class="tight">
+          <li>☐ All modules CRUD + workflows complete &amp; UAT-signed</li>
+          <li>☐ Multi-tenant isolation verified (cross-tenant tests pass)</li>
+          <li>☐ RBAC matrix enforced &amp; audited</li>
+          <li>☐ Payment gateway live keys + reconciliation job</li>
+          <li>☐ Bulk import/export validated</li>
+          <li>☐ Report cards / receipts / certificates render correctly</li>
+        </ul>
+        <h4>Quality</h4>
+        <ul class="tight">
+          <li>☐ ≥80% service coverage, integration suite green</li>
+          <li>☐ Lint/format/type gates in CI</li>
+          <li>☐ Load test at target scale (p95 &lt; 300 ms)</li>
+          <li>☐ Swagger/OpenAPI published &amp; accurate</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Security</h4>
+        <ul class="tight">
+          <li>☐ OWASP Top 10 + pentest remediated</li>
+          <li>☐ JWT rotation, MFA, rate limiting active</li>
+          <li>☐ Secrets in KMS/Secrets Manager, no plaintext</li>
+          <li>☐ TLS, security headers, S3 buckets private</li>
+          <li>☐ Audit &amp; API logs immutable, retention set</li>
+        </ul>
+        <h4>Operations</h4>
+        <ul class="tight">
+          <li>☐ Autoscaling + health/readiness probes</li>
+          <li>☐ Backups + PITR + DR drill executed</li>
+          <li>☐ Monitoring, alerting, dashboards, on-call</li>
+          <li>☐ Centralized structured logging + tracing</li>
+          <li>☐ Runbooks, rollback plan, partition rotation job</li>
+          <li>☐ Data residency &amp; GDPR/consent compliance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>School ERP SaaS Platform — Design &amp; Specification v1.0.</strong> Generated as an enterprise design baseline covering SRS, FRD, TDD, DDD, API Spec and System Architecture. Tune quotas, partition cadence and module priority to the target customer segment before build.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+  // Scrollspy: highlight active TOC link
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const sections = links.map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  const spy = () => {
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i)=>{ if (s.offsetTop <= y) idx = i; });
+    links.forEach(l=>l.classList.remove('active'));
+    if (links[idx]) links[idx].classList.add('active');
+  };
+  document.addEventListener('scroll', spy, {passive:true});
+  window.addEventListener('load', spy);
+</script>
+</body>
+</html>
